@@ -1,11 +1,9 @@
 import SwiftUI
-import PhotosUI
 
 /// A focused multi-photo importer. PhotosPicker grants scoped access without browsing the library directly.
 struct ImportView: View {
     @Environment(\.dismiss) private var dismiss
     @ObservedObject var library: LibraryViewModel
-    @State private var selectedPhotos: [PhotosPickerItem] = []
 
     var body: some View {
         NavigationStack {
@@ -18,7 +16,7 @@ struct ImportView: View {
                     Text("Choose one or many images. Text recognition, categorization, and entity extraction stay on this device.")
                         .multilineTextAlignment(.center).foregroundStyle(.secondary)
                 }
-                PhotosPicker(selection: $selectedPhotos, maxSelectionCount: 30, matching: .images) {
+                ImageImporterButton(onImport: importImages) {
                     Label("Choose photos", systemImage: "photo.badge.plus")
                         .frame(maxWidth: .infinity)
                 }
@@ -29,9 +27,13 @@ struct ImportView: View {
             .navigationTitle("Import")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .topBarTrailing) { Button("Done") { dismiss() } } }
-            .onChange(of: selectedPhotos) { _, newItems in
-                Task { await library.importPhotos(newItems); selectedPhotos = []; dismiss() }
-            }
+        }
+    }
+
+    private func importImages(_ images: [Data]) {
+        Task {
+            await library.importImages(images)
+            dismiss()
         }
     }
 }

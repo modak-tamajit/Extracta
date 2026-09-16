@@ -1,5 +1,4 @@
 import Foundation
-import PhotosUI
 import SwiftData
 import Combine
 
@@ -27,14 +26,13 @@ final class LibraryViewModel: ObservableObject {
         tasks = (try? modelContext.fetch(tasksDescriptor)) ?? []
     }
 
-    func importPhotos(_ selections: [PhotosPickerItem]) async {
-        guard !selections.isEmpty else { return }
+    func importImages(_ images: [Data]) async {
+        guard !images.isEmpty else { return }
         isImporting = true
         defer { isImporting = false; importProgress = ""; refresh() }
-        for (index, selection) in selections.enumerated() {
-            importProgress = "Analyzing \(index + 1) of \(selections.count)…"
+        for (index, data) in images.enumerated() {
+            importProgress = "Analyzing \(index + 1) of \(images.count)…"
             do {
-                guard let data = try await selection.loadTransferable(type: Data.self) else { throw ExtractaError.noPhotoData }
                 try await importImage(data)
             } catch {
                 errorMessage = error.localizedDescription

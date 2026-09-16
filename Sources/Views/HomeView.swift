@@ -1,9 +1,7 @@
 import SwiftUI
-import PhotosUI
 
 struct TodayView: View {
     @ObservedObject var library: LibraryViewModel
-    @State private var selectedPhotos: [PhotosPickerItem] = []
 
     private var openTasks: [GeneratedTask] { library.tasks.filter { !$0.completed } }
     private var tomorrow: Date { Calendar.current.date(byAdding: .day, value: 1, to: .now) ?? .distantFuture }
@@ -28,7 +26,7 @@ struct TodayView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
                 if library.items.isEmpty {
-                    TodayEmptyState(selectedPhotos: $selectedPhotos)
+                    TodayEmptyState(library: library)
                 } else {
                     if !urgentTasks.isEmpty { TimelineSection(title: "Needs attention", subtitle: "Due in the next day", tasks: urgentTasks, library: library) }
                     if !weekTasks.isEmpty { TimelineSection(title: "This week", subtitle: "Extracted from your screenshots", tasks: weekTasks, library: library) }
@@ -60,26 +58,27 @@ struct TodayView: View {
         .navigationTitle("Today")
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                PhotosPicker(selection: $selectedPhotos, maxSelectionCount: 30, matching: .images) { Image(systemName: "plus") }
+                ImageImporterButton(onImport: importImages) { Image(systemName: "plus") }
                     .accessibilityLabel("Import screenshots")
             }
         }
-        .onChange(of: selectedPhotos) { _, newItems in
-            Task { await library.importPhotos(newItems); selectedPhotos = [] }
-        }
         .overlay { if library.isImporting { ProgressOverlay(message: library.importProgress) } }
+    }
+
+    private func importImages(_ images: [Data]) {
+        Task { await library.importImages(images) }
     }
 }
 
 struct TodayEmptyState: View {
-    @Binding var selectedPhotos: [PhotosPickerItem]
+    @ObservedObject var library: LibraryViewModel
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             Image(systemName: "text.viewfinder").font(.system(size: 44)).foregroundStyle(.indigo)
             Text("Remember what matters.").font(.title2.weight(.bold))
             Text("Import screenshots. Extracta reads them on-device, finds important dates and links, and brings useful things back when needed.")
                 .foregroundStyle(.secondary)
-            PhotosPicker(selection: $selectedPhotos, maxSelectionCount: 30, matching: .images) {
+            ImageImporterButton(onImport: { images in Task { await library.importImages(images) } }) {
                 Label("Import screenshots", systemImage: "plus")
             }
             .buttonStyle(.borderedProminent).controlSize(.large)
