@@ -57,7 +57,7 @@ struct TodayView: View {
         }
         .navigationTitle("Today")
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
+            ToolbarItem {
                 ImageImporterButton(onImport: importImages) { Image(systemName: "plus") }
                     .accessibilityLabel("Import screenshots")
             }

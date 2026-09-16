@@ -96,7 +96,6 @@ struct ScreenshotDetailView: View {
             .padding()
         }
         .navigationTitle("Screenshot")
-        .navigationBarTitleDisplayMode(.inline)
         .alert("Extracta", isPresented: Binding(get: { viewModel.copiedMessage != nil }, set: { if !$0 { viewModel.copiedMessage = nil } })) { Button("OK", role: .cancel) {} } message: { Text(viewModel.copiedMessage ?? "") }
     }
 

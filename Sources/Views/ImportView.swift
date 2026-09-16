@@ -25,8 +25,7 @@ struct ImportView: View {
             }
             .padding(28)
             .navigationTitle("Import")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar { ToolbarItem(placement: .topBarTrailing) { Button("Done") { dismiss() } } }
+            .toolbar { ToolbarItem { Button("Done") { dismiss() } } }
         }
     }
 

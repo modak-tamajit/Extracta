@@ -25,7 +25,7 @@ struct PrivacyView: View {
                 }
             }
             .navigationTitle("Privacy")
-            .toolbar { ToolbarItem(placement: .topBarTrailing) { Button("Done") { dismiss() } } }
+            .toolbar { ToolbarItem { Button("Done") { dismiss() } } }
         }
     }
 }

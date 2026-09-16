@@ -26,7 +26,7 @@ struct LibraryView: View {
             .background(.bar)
         }
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
+            ToolbarItem {
                 Button { showingImport = true } label: { Image(systemName: "plus") }
             }
         }
